@@ -73,6 +73,10 @@ public class WorkspaceConstants {
 
 	public static final String WARS_DIR_PROPERTY = "liferay.workspace.wars.dir";
 
+	public static final String WORKSPACE_BOM_VERSION = "liferay.bom.version";
+
+	public static final String WORKSPACE_PRODUCT_PROPERTY = "liferay.workspace.product";
+
 	public static final Map<String, String[]> liferayTargetPlatformVersions = new HashMap<String, String[]>() {
 		{
 			put("7.3", new String[] {"7.3.2", "7.3.1", "7.3.0"});
