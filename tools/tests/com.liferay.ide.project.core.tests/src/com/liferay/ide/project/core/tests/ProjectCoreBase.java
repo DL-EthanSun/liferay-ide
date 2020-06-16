@@ -124,6 +124,8 @@ public class ProjectCoreBase extends ServerCoreBase
 
         workspaceOp.setWorkspaceName( "test-liferay-workspace" );
         workspaceOp.setUseDefaultLocation( true );
+        workspaceOp.setProductCategory("portal");
+        workspaceOp.setProductVersion("portal-7.3-ga3");
 
         if( workspaceOp.validation().ok() )
         {

@@ -68,9 +68,11 @@ public class LiferayWorkspaceUtilTests extends ProjectCoreBase
     public void testLiferayWorkspaceUtil() throws Exception
     {
         NewLiferayWorkspaceOp op = NewLiferayWorkspaceOp.TYPE.instantiate();
-
+        
         op.setWorkspaceName( "test-gradle-liferay-workspace" );
         op.setUseDefaultLocation( true );
+        op.setProductCategory("portal");
+        op.setProductVersion("portal-7.3-ga3");
 
         if( op.validation().ok() )
         {

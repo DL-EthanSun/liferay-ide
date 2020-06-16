@@ -18,6 +18,7 @@ import com.liferay.ide.core.util.StringPool;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
@@ -110,7 +111,7 @@ public class RemoteMonitorProcess extends Process implements IProcess {
 
 	public IStreamsProxy getStreamsProxy() {
 		if (streamsProxy == null) {
-			streamsProxy = new StreamsProxy(this, "UTF-8");
+			streamsProxy = new StreamsProxy(this, Charset.forName("UTF-8"));
 		}
 
 		return streamsProxy;
