@@ -65,8 +65,6 @@ public class TargetLiferayVersionListener
 				op.setBundleUrl(WorkspaceConstants.BUNDLE_URL_CE_7_0);
 			}
 		}
-
-		op.setTargetPlatform(WorkspaceConstants.liferayTargetPlatformVersions.get(liferayVersion)[0]);
 	}
 
 }
