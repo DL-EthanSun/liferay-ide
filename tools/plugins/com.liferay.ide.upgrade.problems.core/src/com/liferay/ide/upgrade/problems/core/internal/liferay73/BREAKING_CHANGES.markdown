@@ -286,11 +286,11 @@ upgrade processes on startup in production environments.
 
 ---------------------------------------
 
-### Removed Cache Bootstrap Feature []
+### Removed Cache Bootstrap Feature[](id=removed-bootstrap-cache-properties)
 - **Date:** 2020-Jan-8
 - **JIRA Ticket:** [LPS-96563](https://issues.liferay.com/browse/LPS-96563)
 
-#### What changed?
+#### What changed? [](id=what-changed-5)
 
 The cache bootstrap feature has been removed. These properties can no longer
 be used to enable/configure cache bootstrap:
@@ -299,16 +299,16 @@ be used to enable/configure cache bootstrap:
 `ehcache.bootstrap.cache.loader.properties.default`,
 `ehcache.bootstrap.cache.loader.properties.${specific.cache.name}`.
 
-#### Who is affected?
+#### Who is affected? [](id=who-is-affected-5)
 
 This affects anyone using the properties listed above.
 
-#### How should I update my code?
+#### How should I update my code? [](id=how-should-i-update-my-code-5)
 
 There's no direct replacement for the removed feature. If you have code that
 depends on it, you must implement it yourself.
 
-#### Why was this change made?
+#### Why was this change made? [](id=why-was-this-change-made-5)
 
 This change was made to avoid security issues.
 
