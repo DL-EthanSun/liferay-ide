@@ -78,7 +78,9 @@ public class ProductVersionDefaultValueService extends DefaultValueService imple
 
 		Value<Object> property = element.property(ProductVersionElement.PROP_PRODUCT_VERSION);
 
-		return property.service(PossibleValuesService.class);
+		PossibleValuesService possibleValuesService = property.service(PossibleValuesService.class);
+
+		return possibleValuesService;
 	}
 
 	private String _defaultValue = null;

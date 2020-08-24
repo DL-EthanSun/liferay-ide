@@ -14,12 +14,9 @@
 
 package com.liferay.ide.upgrade.plan.core.internal;
 
-import com.liferay.ide.upgrade.plan.core.IUpgradePlanOutline;
-import com.liferay.ide.upgrade.plan.core.UpgradePlanCorePlugin;
-
-import java.util.List;
-
 import org.eclipse.sapphire.DefaultValueService;
+
+import com.liferay.ide.core.util.JobUtil;
 
 /**
  * @author Ethan Sun
@@ -33,13 +30,11 @@ public class OutlineDefaultValueService extends DefaultValueService {
 
 	@Override
 	protected void initDefaultValueService() {
-		List<IUpgradePlanOutline> outlines = UpgradePlanCorePlugin.getAllOutlines();
+		JobUtil.waitForLiferayProjectJob();
+		
+		_defaultValue = context(OutlinePossibleValuesService.class).values().iterator().next();
 
-		IUpgradePlanOutline outline = outlines.get(0);
-
-		_defaultValue = outline.getName();
 	}
 
-	private String _defaultValue;
-
+	private static String _defaultValue;
 }

@@ -24,7 +24,7 @@ import org.eclipse.sapphire.services.ServiceContext;
 /**
  * @author Simon Jiang
  */
-public class OutlineValueServiceConditon extends ServiceCondition {
+public class OutlineValueServiceCondition extends ServiceCondition {
 
 	@Override
 	public boolean applicable(final ServiceContext context) {
