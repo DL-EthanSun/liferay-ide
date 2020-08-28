@@ -44,7 +44,7 @@ public class AssetPreviewTagsTest {
 
 		List<UpgradeProblem> problems = m.findUpgradeProblems(new File("jsptests/asset-preview/"), versions, new NullProgressMonitor());
 
-		Assert.assertEquals("", 1, problems.size());
+		Assert.assertEquals("", 2, problems.size());
 
 		boolean found = false;
 
