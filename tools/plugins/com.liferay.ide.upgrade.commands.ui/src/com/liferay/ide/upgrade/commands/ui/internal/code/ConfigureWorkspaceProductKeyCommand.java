@@ -113,7 +113,7 @@ public class ConfigureWorkspaceProductKeyCommand implements UpgradeCommand, Upgr
 				return new Status(IStatus.ERROR, "unknown", 1, "", null);
 			}
 
-			return Status.OK_STATUS;
+			return new Status(IStatus.OK, "unknown", 0, "", null);
 		}
 
 	}
