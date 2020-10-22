@@ -41,6 +41,7 @@ import org.junit.Test;
  * @author Gregory Amerson
  * @author Simon Jiang
  */
+
 public class NewLiferayComponentOpTests extends BaseTests
 {
 	@AfterClass
@@ -236,7 +237,7 @@ public class NewLiferayComponentOpTests extends BaseTests
     public void testNewLiferayComponentActionCommandPortlet()  throws Exception{
         NewLiferayModuleProjectOp op = NewLiferayModuleProjectOp.TYPE.instantiate();
 
-        op.setProjectName( "action-command-test" );
+        op.setProjectName( "testGradleModuleComponentPortlet" );
         op.setProjectTemplateName( "api" );
         op.setProjectProvider( "gradle-module" );
 
