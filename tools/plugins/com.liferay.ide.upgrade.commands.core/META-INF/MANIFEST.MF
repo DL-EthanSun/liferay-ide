@@ -10,6 +10,7 @@ Bundle-Version: 3.9.1.qualifier
 Export-Package: com.liferay.ide.upgrade.commands.core,
  com.liferay.ide.upgrade.commands.core.buildservice,
  com.liferay.ide.upgrade.commands.core.code,
+ com.liferay.ide.upgrade.commands.core.internal,
  com.liferay.ide.upgrade.commands.core.sdk
 Require-Bundle: com.google.guava,
  com.liferay.ide.core,
