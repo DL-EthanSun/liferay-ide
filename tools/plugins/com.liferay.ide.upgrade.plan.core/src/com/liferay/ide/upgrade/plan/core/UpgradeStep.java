@@ -290,6 +290,15 @@ public class UpgradeStep {
 		upgradePlanner.dispatch(upgradeStepStatusChangedEvent);
 	}
 
+	public Stream<UpgradeStep> stream() {
+		return Stream.concat(
+			Stream.of(this),
+			_children.stream(
+			).flatMap(
+				UpgradeStep::stream
+			));
+	}
+
 	private List<UpgradeStep> _children = new ArrayList<>();
 	private String _commandId;
 	private String _icon;

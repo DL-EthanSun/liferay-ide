@@ -14,9 +14,13 @@
 
 package com.liferay.ide.upgrade.plan.ui.internal;
 
+import com.liferay.ide.upgrade.plan.core.UpgradePlan;
+import com.liferay.ide.upgrade.plan.core.UpgradePlanner;
+import com.liferay.ide.upgrade.plan.core.UpgradeStep;
 import com.liferay.ide.upgrade.plan.ui.UpgradeInfoProvider;
 import com.liferay.ide.upgrade.plan.ui.util.UIUtil;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.eclipse.jface.viewers.ISelection;
@@ -26,6 +30,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -43,18 +49,26 @@ import org.osgi.util.tracker.ServiceTracker;
 /**
  * @author Terry Jia
  * @author Gregory Amerson
+ * @author Ethan Sun
  */
 public class UpgradePlanInfoPage extends Page implements ISelectionChangedListener {
 
 	public UpgradePlanInfoPage(IWorkbenchPart workbenchPart) {
 		_workbenchPart = workbenchPart;
 
-		Bundle bundle = FrameworkUtil.getBundle(UpgradePlanInfoPage.class);
+		Bundle upgradePlanInfoPageBundle = FrameworkUtil.getBundle(UpgradePlanInfoPage.class);
 
 		_upgradeInfoProviderServiceTracker = new ServiceTracker<>(
-			bundle.getBundleContext(), UpgradeInfoProvider.class, null);
+			upgradePlanInfoPageBundle.getBundleContext(), UpgradeInfoProvider.class, null);
 
 		_upgradeInfoProviderServiceTracker.open();
+
+		Bundle upgradePlannerBundle = FrameworkUtil.getBundle(UpgradePlanner.class);
+
+		_upgradePlannerServiceTracker = new ServiceTracker<>(
+			upgradePlannerBundle.getBundleContext(), UpgradePlanner.class, null);
+
+		_upgradePlannerServiceTracker.open();
 	}
 
 	@Override
@@ -66,6 +80,47 @@ public class UpgradePlanInfoPage extends Page implements ISelectionChangedListen
 		_browser = new Browser(_composite, SWT.BORDER);
 
 		_browser.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		_browser.addLocationListener(
+			new LocationListener() {
+
+				@Override
+				public void changed(LocationEvent event) {
+				}
+
+				@Override
+				public void changing(LocationEvent event) {
+					String url = event.location;
+
+					if (url.startsWith("file://")) {
+						_browser.setUrl("about:blank");
+
+						final String targetUrl = url.substring(8);
+
+						UpgradePlanner upgradePlannerService = _upgradePlannerServiceTracker.getService();
+
+						UpgradePlan upgradePlan = upgradePlannerService.getCurrentUpgradePlan();
+
+						List<UpgradeStep> upgradeStepList = upgradePlan.getUpgradeSteps();
+
+						Stream<UpgradeStep> upgradeStepStream = upgradeStepList.stream();
+
+						upgradeStepStream.forEach(
+							upgradeStep -> upgradeStep.stream(
+							).filter(
+								currentStep -> {
+									String stepUrl = currentStep.getUrl();
+
+									return stepUrl.endsWith(targetUrl);
+								}
+							).findFirst(
+							).ifPresent(
+								UpgradePlanInfoPage.this::renderBrowser
+							));
+					}
+				}
+
+			});
 	}
 
 	@Override
@@ -91,6 +146,43 @@ public class UpgradePlanInfoPage extends Page implements ISelectionChangedListen
 		selectionProvider.addSelectionChangedListener(this);
 	}
 
+	public void renderBrowser(Object element) {
+		Stream.of(
+			_upgradeInfoProviderServiceTracker.getServices(new UpgradeInfoProvider[0])
+		).filter(
+			upgradeInfoProvider -> upgradeInfoProvider.provides(element)
+		).findFirst(
+		).ifPresent(
+			upgradeInfoProvider -> {
+				Promise<String> detail = upgradeInfoProvider.getDetail(element);
+
+				detail.onResolve(
+					() -> UIUtil.async(
+						() -> {
+							try {
+								if (detail.getFailure() != null) {
+									_browser.setText("about:blank");
+								}
+								else {
+									String detailValue = detail.getValue();
+
+									if (detailValue.startsWith("https://") || detailValue.equals("about:blank")) {
+										_browser.setUrl(detailValue);
+									}
+									else {
+										_browser.setText(detailValue, true);
+									}
+								}
+
+								_composite.redraw();
+							}
+							catch (Exception e) {
+							}
+						}));
+			}
+		);
+	}
+
 	@Override
 	public void selectionChanged(SelectionChangedEvent selectionChangedEvent) {
 		if ((_browser == null) || _browser.isDisposed()) {
@@ -102,42 +194,7 @@ public class UpgradePlanInfoPage extends Page implements ISelectionChangedListen
 		if (selection instanceof StructuredSelection) {
 			StructuredSelection structuredSelection = (StructuredSelection)selection;
 
-			Object firstElement = structuredSelection.getFirstElement();
-
-			Stream.of(
-				_upgradeInfoProviderServiceTracker.getServices(new UpgradeInfoProvider[0])
-			).filter(
-				upgradeInfoProvider -> upgradeInfoProvider.provides(firstElement)
-			).findFirst(
-			).ifPresent(
-				upgradeInfoProvider -> {
-					Promise<String> detail = upgradeInfoProvider.getDetail(firstElement);
-
-					detail.onResolve(
-						() -> UIUtil.async(
-							() -> {
-								try {
-									if (detail.getFailure() != null) {
-										_browser.setText("about:blank");
-									}
-									else {
-										String detailValue = detail.getValue();
-
-										if (detailValue.startsWith("https://") || detailValue.equals("about:blank")) {
-											_browser.setUrl(detailValue);
-										}
-										else {
-											_browser.setText(detail.getValue(), true);
-										}
-									}
-
-									_composite.redraw();
-								}
-								catch (Exception e) {
-								}
-							}));
-				}
-			);
+			renderBrowser(structuredSelection.getFirstElement());
 		}
 	}
 
@@ -155,6 +212,7 @@ public class UpgradePlanInfoPage extends Page implements ISelectionChangedListen
 	private Browser _browser;
 	private Composite _composite;
 	private final ServiceTracker<UpgradeInfoProvider, UpgradeInfoProvider> _upgradeInfoProviderServiceTracker;
+	private final ServiceTracker<UpgradePlanner, UpgradePlanner> _upgradePlannerServiceTracker;
 	private IWorkbenchPart _workbenchPart;
 
 }
