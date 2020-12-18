@@ -36,8 +36,8 @@ public class ImportLiferayWorkspaceWizard extends BaseProjectWizard<ImportLifera
 		super(_createDefaultOp(), DefinitionLoader.sdef(ImportLiferayWorkspaceWizard.class).wizard());
 	}
 
-	public ImportLiferayWorkspaceWizard(Boolean showDownloadBundle) {
-		super(_createDefaultOp(showDownloadBundle), DefinitionLoader.sdef(ImportLiferayWorkspaceWizard.class).wizard());
+	public ImportLiferayWorkspaceWizard(ImportLiferayWorkspaceOp importLiferayWorkspaceOp) {
+		super(importLiferayWorkspaceOp, DefinitionLoader.sdef(ImportLiferayWorkspaceWizard.class).wizard());
 	}
 
 	@Override
@@ -73,14 +73,6 @@ public class ImportLiferayWorkspaceWizard extends BaseProjectWizard<ImportLifera
 
 	private static ImportLiferayWorkspaceOp _createDefaultOp() {
 		return ImportLiferayWorkspaceOp.TYPE.instantiate();
-	}
-
-	private static ImportLiferayWorkspaceOp _createDefaultOp(Boolean showDownloadBundle) {
-		ImportLiferayWorkspaceOp importWorkspaceOp = ImportLiferayWorkspaceOp.TYPE.instantiate();
-
-		importWorkspaceOp.setShowDownloadBundle(showDownloadBundle);
-
-		return importWorkspaceOp;
 	}
 
 }
