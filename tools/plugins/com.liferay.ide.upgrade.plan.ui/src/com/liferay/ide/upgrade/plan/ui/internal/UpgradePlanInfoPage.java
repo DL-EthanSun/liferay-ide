@@ -14,6 +14,7 @@
 
 package com.liferay.ide.upgrade.plan.ui.internal;
 
+import com.liferay.ide.core.util.CoreUtil;
 import com.liferay.ide.upgrade.plan.core.UpgradePlan;
 import com.liferay.ide.upgrade.plan.core.UpgradePlanner;
 import com.liferay.ide.upgrade.plan.core.UpgradeStep;
@@ -92,10 +93,19 @@ public class UpgradePlanInfoPage extends Page implements ISelectionChangedListen
 				public void changing(LocationEvent event) {
 					String url = event.location;
 
-					if (url.startsWith("file://")) {
+					if (!url.startsWith("about:blank") && !url.startsWith("http")) {
 						_browser.setUrl("about:blank");
 
-						final String targetUrl = url.substring(8);
+						String replacement = "";
+
+						if (CoreUtil.isWindows()) {
+							replacement = "about:";
+						}
+						else {
+							replacement = "file:///";
+						}
+
+						final String targetUrl = url.replaceFirst(replacement, "");
 
 						UpgradePlanner upgradePlannerService = _upgradePlannerServiceTracker.getService();
 
@@ -110,6 +120,10 @@ public class UpgradePlanInfoPage extends Page implements ISelectionChangedListen
 							).filter(
 								currentStep -> {
 									String stepUrl = currentStep.getUrl();
+
+									if (CoreUtil.isWindows()) {
+										stepUrl = stepUrl.replace('\\', '/');
+									}
 
 									return stepUrl.endsWith(targetUrl);
 								}
