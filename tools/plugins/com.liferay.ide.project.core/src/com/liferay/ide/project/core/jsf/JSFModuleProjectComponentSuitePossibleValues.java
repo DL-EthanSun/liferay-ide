@@ -56,9 +56,11 @@ public class JSFModuleProjectComponentSuitePossibleValues
 		}
 
 		for (String value : _newPossibleValues) {
-			if (!possibleValues.contains(value)) {
-				values.add(value);
+			if (possibleValues.contains(value) || "adf".equals(value)) {
+				continue;
 			}
+
+			values.add(value);
 		}
 	}
 
