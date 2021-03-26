@@ -16,6 +16,11 @@ package com.liferay.ide.server.core.portal.docker;
 
 import com.liferay.ide.server.core.LiferayServerCore;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.wst.server.core.IServer;
 import org.eclipse.wst.server.core.util.ServerLifecycleAdapter;
 
@@ -33,20 +38,30 @@ public class PortalDockerServerLifecycleAdapter extends ServerLifecycleAdapter {
 			return;
 		}
 
-		IDockerSupporter dockerSupporter = LiferayServerCore.getDockerSupporter();
+		Job job = new Job("Remove Docker Container") {
 
-		if (dockerSupporter == null) {
-			return;
-		}
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				IDockerSupporter dockerSupporter = LiferayServerCore.getDockerSupporter();
 
-		try {
-			dockerSupporter.stopDockerContainer(null);
+				if (dockerSupporter == null) {
+					return LiferayServerCore.createErrorStatus("Failed to get docker supporter");
+				}
 
-			dockerSupporter.removeDockerContainer(null);
-		}
-		catch (Exception e) {
-			LiferayServerCore.logError("Failed to remove server", e);
-		}
+				try {
+				}
+				catch (Exception e) {
+					LiferayServerCore.logError("Failed to remove server", e);
+				}
+
+				dockerSupporter.removeDockerContainer(new NullProgressMonitor());
+
+				return Status.OK_STATUS;
+			}
+
+		};
+
+		job.schedule();
 	}
 
 }

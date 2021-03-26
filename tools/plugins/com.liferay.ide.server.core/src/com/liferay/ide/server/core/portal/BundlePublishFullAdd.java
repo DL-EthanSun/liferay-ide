@@ -80,18 +80,16 @@ public class BundlePublishFullAdd extends BundlePublishOperation {
 							monitor.subTask(
 								"Remotely deploying " + module.getName() + " to Liferay module framework...");
 
-							PortalDockerServer dockerSever = (PortalDockerServer)server.loadAdapter(
+							PortalDockerServer dockerServer = (PortalDockerServer)server.loadAdapter(
 								PortalDockerServer.class, monitor);
 
-							if (dockerSever != null) {
-								IDockerSupporter[] dockerSupporters = LiferayServerCore.getDockerSupporters();
+							if (dockerServer != null) {
+								IDockerSupporter dockerSupporter = LiferayServerCore.getDockerSupporter();
 
-								for (IDockerSupporter dockerSupporter : dockerSupporters) {
-									boolean canPublish = dockerSupporter.canPublishModule(server, module);
+								boolean canPublish = dockerSupporter.canPublishModule(server, module);
 
-									if (canPublish) {
-										dockerSupporter.dockerDeploy(project, monitor);
-									}
+								if (canPublish) {
+									dockerSupporter.dockerDeploy(project, monitor);
 								}
 							}
 							else {

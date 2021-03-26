@@ -17,7 +17,6 @@ package com.liferay.ide.gradle.action;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.ListContainersCmd;
 import com.github.dockerjava.api.command.ListImagesCmd;
-import com.github.dockerjava.api.command.RemoveImageCmd;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.Image;
 
@@ -40,6 +39,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.wst.server.core.IRuntime;
@@ -95,7 +95,7 @@ public class InitDockerBundleTaskAction extends GradleTaskAction {
 		try (DockerClient dockerClient = LiferayDockerClient.getDockerClient()) {
 			ListImagesCmd listImagesCmd = dockerClient.listImagesCmd();
 
-			listImagesCmd.withShowAll(false);
+			listImagesCmd.withShowAll(true);
 
 			List<Image> images = listImagesCmd.exec();
 
@@ -188,25 +188,9 @@ public class InitDockerBundleTaskAction extends GradleTaskAction {
 			else {
 				IDockerSupporter dockerSupporter = new LiferayGradleDockerSupporter();
 
-				dockerSupporter.stopDockerContainer(null);
+				dockerSupporter.removeDockerContainer(new NullProgressMonitor());
 
-				dockerSupporter.removeDockerContainer(null);
-
-				ListImagesCmd listImagesCmd = dockerClient.listImagesCmd();
-
-				listImagesCmd.withShowAll(false);
-
-				List<Image> images = listImagesCmd.exec();
-
-				for (Image image : images) {
-					String imageRepoTag = image.getRepoTags()[0];
-
-					if (imageRepoTag.equals(_projectInfo.getDockerImageId())) {
-						RemoveImageCmd removeImageCmd = dockerClient.removeImageCmd(image.getId());
-
-						removeImageCmd.exec();
-					}
-				}
+				dockerSupporter.cleanDockerImage(new NullProgressMonitor());
 			}
 		}
 		catch (Exception e) {

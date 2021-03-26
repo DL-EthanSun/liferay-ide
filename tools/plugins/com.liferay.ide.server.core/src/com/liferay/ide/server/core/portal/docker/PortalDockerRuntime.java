@@ -25,6 +25,7 @@ import com.liferay.ide.server.util.LiferayDockerClient;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -94,22 +95,21 @@ public class PortalDockerRuntime extends PortalRuntime implements IPortalDockerR
 
 			List<Image> images = listImagesCmd.exec();
 
-			Optional<Image> dockerImage = Optional.ofNullable(
-				images.stream(
-				).filter(
-					image -> {
-						String imageRepoTag = image.getRepoTags()[0];
+			String imageRepoTag = String.join(":", getImageRepo(), getImageTag());
 
-						return imageRepoTag.equals(String.join(":", getImageRepo(), getImageTag()));
-					}
-				).findFirst(
-				).get());
+			Stream<Image> imageStream = images.stream();
 
-			if (dockerImage.isPresent()) {
-				return Status.OK_STATUS;
+			Optional<Image> dockerImage = imageStream.filter(
+				image -> {
+					String imageRepoTagDocker = image.getRepoTags()[0];
+
+					return imageRepoTagDocker.equals(imageRepoTag);
+				}
+			).findFirst();
+
+			if (!dockerImage.isPresent()) {
+				return LiferayServerCore.createErrorStatus("Image is not existed");
 			}
-
-			return LiferayServerCore.createErrorStatus("Image is not existed");
 		}
 		catch (Exception e) {
 			LiferayServerCore.logError(e);

@@ -24,7 +24,11 @@ import com.liferay.ide.server.util.LiferayDockerClient;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.wst.server.core.IRuntime;
 import org.eclipse.wst.server.core.util.RuntimeLifecycleAdapter;
 
@@ -62,9 +66,24 @@ public class PortalDockerRuntimeLifecycleAdapter extends RuntimeLifecycleAdapter
 			).findFirst(
 			).ifPresent(
 				image -> {
-					IDockerSupporter dockerSupporter = LiferayServerCore.getDockerSupporter();
+					Job job = new Job("Clean Docker Image") {
 
-					dockerSupporter.removeDockerContainer(new NullProgressMonitor());
+						@Override
+						protected IStatus run(IProgressMonitor monitor) {
+							IDockerSupporter dockerSupporter = LiferayServerCore.getDockerSupporter();
+
+							if (dockerSupporter == null) {
+								return LiferayServerCore.createErrorStatus("Failed to get docker supporter");
+							}
+
+							dockerSupporter.cleanDockerImage(new NullProgressMonitor());
+
+							return Status.OK_STATUS;
+						}
+
+					};
+
+					job.schedule();
 				}
 			);
 		}

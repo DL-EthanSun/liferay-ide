@@ -64,8 +64,6 @@ public abstract class GradleTaskAction extends AbstractObjectAction {
 				return;
 			}
 
-			beforeAction();
-
 			Job job = new Job(project.getName() + " - " + getGradleTaskName()) {
 
 				@Override
@@ -77,7 +75,7 @@ public abstract class GradleTaskAction extends AbstractObjectAction {
 
 						GradleUtil.runGradleTask(project, gradleTasks.toArray(new String[0]), monitor);
 
-						monitor.worked(80);
+						monitor.done();
 					}
 					catch (Exception e) {
 						return LiferayGradleUI.createErrorStatus("Error running Gradle goal " + getGradleTaskName(), e);
@@ -90,6 +88,11 @@ public abstract class GradleTaskAction extends AbstractObjectAction {
 
 			job.addJobChangeListener(
 				new JobChangeAdapter() {
+
+					@Override
+					public void aboutToRun(IJobChangeEvent event) {
+						beforeAction();
+					}
 
 					@Override
 					public void done(IJobChangeEvent event) {
