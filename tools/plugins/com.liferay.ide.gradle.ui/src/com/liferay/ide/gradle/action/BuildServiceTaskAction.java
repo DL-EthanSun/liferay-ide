@@ -20,18 +20,44 @@ import com.liferay.ide.gradle.core.GradleUtil;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 
 /**
  * @author Lovett Li
  * @author Terry Jia
  * @author Andy Wu
+ * @author Ethan Sun
  */
 public class BuildServiceTaskAction extends GradleTaskAction {
+
+	@Override
+	public void selectionChanged(IAction action, ISelection selection) {
+		super.selectionChanged(action, selection);
+
+		if (fSelection instanceof IStructuredSelection) {
+			IStructuredSelection structuredSelection = (IStructuredSelection)fSelection;
+
+			Object[] elems = structuredSelection.toArray();
+
+			if (ListUtil.isNotEmpty(elems)) {
+				Object elem = elems[0];
+
+				if (elem instanceof IProject) {
+					IContainer container = (IContainer)elem;
+
+					action.setEnabled(container.findMember("service.xml") != null);
+				}
+			}
+		}
+	}
 
 	protected void afterAction() {
 		boolean refresh = false;
