@@ -34,6 +34,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.wst.server.core.IRuntime;
@@ -113,6 +114,8 @@ public class InitDockerBundleTaskAction extends GradleTaskAction {
 			);
 
 			if (imageRepoTag != null) {
+				IProject project = LiferayWorkspaceUtil.getWorkspaceProject();
+
 				IRuntimeType portalRuntimeType = ServerCore.findRuntimeType(PortalDockerRuntime.ID);
 
 				IRuntimeWorkingCopy runtimeWC = portalRuntimeType.createRuntime(portalRuntimeType.getName(), null);
