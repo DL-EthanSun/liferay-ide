@@ -91,6 +91,11 @@ public class InitDockerBundleTaskAction extends GradleTaskAction {
 	}
 
 	@Override
+	protected String[] getGradleTaskArguments() {
+		return new String[] {"--rerun-tasks"};
+	}
+
+	@Override
 	protected String getGradleTaskName() {
 		return "createDockerContainer";
 	}
@@ -168,9 +173,7 @@ public class InitDockerBundleTaskAction extends GradleTaskAction {
 				PortalDockerServer portalDockerServer = (PortalDockerServer)server.loadAdapter(
 					PortalDockerServer.class, null);
 
-				if (Objects.nonNull(portalDockerServer) &&
-					Objects.equals(_projectInfo.getDockerContainerId(), portalDockerServer.getContainerName())) {
-
+				if (Objects.nonNull(portalDockerServer)) {
 					server.delete();
 				}
 			}
@@ -186,11 +189,7 @@ public class InitDockerBundleTaskAction extends GradleTaskAction {
 				PortalDockerRuntime portalDockerRuntime = (PortalDockerRuntime)runtime.loadAdapter(
 					PortalDockerRuntime.class, null);
 
-				if (Objects.nonNull(portalDockerRuntime) &&
-					Objects.equals(
-						_projectInfo.getDockerImageId(),
-						String.join(":", portalDockerRuntime.getImageRepo(), portalDockerRuntime.getImageTag()))) {
-
+				if (Objects.nonNull(portalDockerRuntime)) {
 					runtime.delete();
 				}
 			}
